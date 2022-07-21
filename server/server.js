@@ -13,15 +13,16 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+let conn;
+
 async function connectMariadb() {
-  let conn;
   try {
     // Create a new connection
     conn = await mariadb.createConnection({
-      host: process.env.LDB_HOST,
-      port: process.env.LDB_PORT,
-      user: process.env.LDB_USER,
-      password: process.env.LDB_PASS,
+      host: process.env.MDB_HOST,
+      port: process.env.MDB_PORT,
+      user: process.env.MDB_USER,
+      password: process.env.MDB_PASS,
     });
 
     // Print connection thread
@@ -36,6 +37,20 @@ async function connectMariadb() {
 }
 
 connectMariadb();
+
+// https://github.com/mariadb-corporation/mariadb-connector-nodejs/blob/master/documentation/promise-api.md
+// query example
+async function query() {
+  const rows = await conn.query('SELECT 1 as val');
+  console.log(rows); //[ {val: 1}, meta: ... ]
+
+  const res = await conn.query('INSERT INTO someTable VALUES (?, ?, ?)', [
+    1,
+    Buffer.from('c327a97374', 'hex'),
+    'mariadb',
+  ]);
+  //will send INSERT INTO someTable VALUES (1, _BINARY '.\'.st', 'mariadb')
+}
 
 app.get('/hello', (req, res) => {
   res.send({ hello: 'Hello Im from server' });
