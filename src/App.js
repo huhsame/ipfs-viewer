@@ -24,6 +24,7 @@ function App() {
     const getHello = async () => {
       const res = await axios.get('/hello');
       setHello(res.data.hello);
+      console.log(res.data.list);
     };
     getHello();
   }, [ipfs]); // ipfs 값이 변경될때마다 effect 재실행
