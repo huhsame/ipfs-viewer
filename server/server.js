@@ -70,6 +70,9 @@ async function findAll() {
 }
 
 app.get('/hello', async (req, res) => {
+  // 해시 찾고, 여기에서 파일 받고 저장해서
+  // 클라이언트가 그 파일 꺼내서 보여줄수잇게 파일이름하고 경로 보내
+
   const list = await findAll();
   res.send({ hello: 'Hello Im from server', list });
 });

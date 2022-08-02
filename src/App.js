@@ -25,6 +25,12 @@ function App() {
       const res = await axios.get('/hello');
       setHello(res.data.hello);
       console.log(res.data.list);
+
+      const row = res.data.list[0];
+
+      const cid = row.Hash;
+      const data = await ipfs.get(cid);
+      console.log(data);
     };
     getHello();
   }, [ipfs]); // ipfs 값이 변경될때마다 effect 재실행
