@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from './axios.js';
 import useIpfsFactory from './hooks/use-ipfs-factory.js';
 import useIpfs from './hooks/use-ipfs.js';
+import ChartCSI from './components/chartCSI.js';
 
 import './App.css';
 
@@ -26,11 +27,9 @@ function App() {
       setHello(res.data.hello);
       console.log(res.data.list);
 
-      const row = res.data.list[0];
+      // const row = res.data.list[0];
 
-      const cid = row.Hash;
-      const data = await ipfs.get(cid);
-      console.log(data);
+      // const data = await ipfs.get(cid);
     };
     getHello();
   }, [ipfs]); // ipfs 값이 변경될때마다 effect 재실행
@@ -38,6 +37,7 @@ function App() {
     <div className='App'>
       <header className='App-header'>
         <p>{hello}</p>
+        <ChartCSI></ChartCSI>
       </header>
     </div>
   );

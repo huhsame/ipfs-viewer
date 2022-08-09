@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const mariadb = require('mariadb');
+const ipfssh = require('./ipfs-sh.js');
 
 const PORT = 3001;
 
@@ -60,21 +61,43 @@ async function findAll() {
   let timeEnd = '18:49:00';
   const valArr = [topic, date, timeStart, timeEnd];
   //   const sql = 'SELECT * FROM ? WHERE Date = ? and Time >= ? and Time <= ?';
-  const sql = `SELECT * FROM esp WHERE Date = '${date}' AND Time >= '${timeStart}' AND Time <= '${timeEnd}' limit 5`;
+  const sql = `SELECT * FROM esp WHERE Date = '${date}' AND Time >= '${timeStart}' AND Time <= '${timeEnd}' limit 1`;
 
-  // 아 왜틀렸대 문법이
-  const rows = await db.query(sql);
-  console.log(rows);
+  const metas = await db.query(sql);
+  // 배열.
+  // 한개의 meta는 이렇게 구성
+  // {
+  //   Hash: 'QmWpjEsocoLxU19geETNhmprD7XvvxM72zSRbePGLMYwZM',
+  //   Date: 2022-07-19T15:00:00.000Z,
+  //   Time: '18:46:58',
+  //   Publisher: 'esp3',
+  //   Pin_add: 'Y',
+  //   Get: 'Y',
+  //   File_name: 'S3_20220720_18_46_58.csv'
+  // }
 
-  return rows;
+  const list = [];
+  metas.forEach(function (value, index, array) {
+    let CSI = ipfssh.getCSIdatabyIPFS(value.Hash, value.File_name);
+
+    list.push(CSI);
+  });
+
+  console.log(list);
+  return list;
 }
 
+async function getSample() {
+  let CSI = ipfssh.getCSI();
+  return [CSI];
+}
 app.get('/hello', async (req, res) => {
   // 해시 찾고, 여기에서 파일 받고 저장해서
   // 클라이언트가 그 파일 꺼내서 보여줄수잇게 파일이름하고 경로 보내
 
-  const list = await findAll();
-  res.send({ hello: 'Hello Im from server', list });
+  // const list = await findAll();
+  const list = await getSample();
+  res.send({ hello: 'Hello Im from server', list: list });
 });
 app.get('/', (req, res) => {
   res.send('Server Response Success');
