@@ -93,7 +93,6 @@ function getCSIfromCSV(path) {
   let data = [];
 
   rows.forEach(function (currentRow, index, rowsArray) {
-    let rowData = {};
     const row = currentRow.split(','); // 한줄
     const valuesOfRow = row.slice(0, row.length - 7 - 2);
     // 뒤에 이상한값 2개가 더 있어서 빼버림
@@ -109,14 +108,21 @@ function getCSIfromCSV(path) {
       Number(time[6]) // ms
     );
 
-    rowData['timestamp'] = Date.parse(timestamp);
     valuesOfRow.forEach(function (value, index, array) {
-      rowData[`subcarrier_${index + 1}`] = Number(value);
+      // if (index < 30) {
+      let rowData = {};
+
+      rowData['subcarrier'] = index;
+      rowData['timestamp'] = Date.parse(timestamp);
+      rowData['value'] = Number(value);
+
+      data.push(rowData);
+      // }
     });
-    data.push(rowData);
+    data.pop(); // 맨뒤에 이상하게 붙더라 그거 빼
+    data.sort(function (a, b) {
+      return a.timestamp - b.timestamp;
+    });
   });
-
-  data.pop(); // 맨뒤에 이상하게 붙더라 그거 빼
-
-  return data;
+  return [...new Set(data)]; // 왤케 중복이 돼 ...? 중복제거
 }
