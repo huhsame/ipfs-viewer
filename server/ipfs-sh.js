@@ -21,18 +21,11 @@ exports.getCSIdatabyIPFS = function (hash, filename) {
 
 // for test
 exports.getCSI = function () {
-  let dataCSI = {};
-
-  dataCSI = getCSIfromCSV(
+  let dataCSI = getCSIfromCSV(
     '/Users/huh/workspace/ipfs-viewer/files/S3_20220720_18_46_58.csv'
   );
 
   return dataCSI;
-  // { timestamp: date, data:[number, ... ]}
-
-  // {CSI: { timestamp: date, data:[number, ... ]},
-  // max: max,
-  // min: min, start, end}
 };
 function downloadFileByCID(cid) {
   // shell 명령어로 ipfs get 실행
@@ -97,31 +90,15 @@ function setFileName(hash, filename) {
 function getCSIfromCSV(path) {
   const csvfile = fs.readFileSync(path, 'utf8');
   const rows = csvfile.split('\n');
-  let jsonArray = [];
-  let maxRows = [];
-  let minRows = [];
-  let timestampRows = [];
+  let data = [];
 
   rows.forEach(function (currentRow, index, rowsArray) {
-    let obj = {};
-    let row = currentRow.split(','); // 한줄
+    let rowData = {};
+    const row = currentRow.split(','); // 한줄
+    const valuesOfRow = row.slice(0, row.length - 7 - 2);
+    // 뒤에 이상한값 2개가 더 있어서 빼버림
 
-    let data = row.slice(0, row.length - 7);
-
-    let max = Math.max.apply(null, data);
-    maxRows.push(max);
-    let min = Math.min.apply(null, data);
-    minRows.push(min);
-
-    data.forEach(function (value, index, dataArray) {
-      // 한 항목마다
-      dataArray[index] = Number(value);
-    });
-    obj['data'] = data;
-
-    let time = row.slice(row.length - 7, row.length);
-    // console.log(time);
-
+    const time = row.slice(row.length - 7, row.length);
     const timestamp = new Date(
       Number(time[0]), // year
       Number(time[1]), // month
@@ -132,40 +109,14 @@ function getCSIfromCSV(path) {
       Number(time[6]) // ms
     );
 
-    obj['timestamp'] = timestamp;
-
-    jsonArray.push(obj);
-    timestampRows.push(timestamp);
-    // console.log(obj);
+    rowData['timestamp'] = Date.parse(timestamp);
+    valuesOfRow.forEach(function (value, index, array) {
+      rowData[`subcarrier_${index + 1}`] = Number(value);
+    });
+    data.push(rowData);
   });
 
-  jsonArray.pop(); // 맨뒤에 이상하게 붙더라 그거 빼
-  minRows.pop();
-  maxRows.pop();
-  timestampRows.pop();
-  // console.log(minRows, maxRows);
+  data.pop(); // 맨뒤에 이상하게 붙더라 그거 빼
 
-  //최대값
-  let max = maxRows.reduce(function (previous, current) {
-    return previous > current ? previous : current;
-  });
-
-  //최소값
-  let min = minRows.reduce(function (previous, current) {
-    return previous > current ? current : previous;
-  });
-
-  //최대값
-  let end = timestampRows.reduce(function (previous, current) {
-    return previous > current ? previous : current;
-  });
-
-  //최소값
-  let start = timestampRows.reduce(function (previous, current) {
-    return previous > current ? current : previous;
-  });
-
-  // let start = Math.min.apply(null, timestampRows);
-  // let end = Math.max.apply(null, timestampRows);
-  return { CSI: jsonArray, max, min, start, end };
+  return data;
 }
