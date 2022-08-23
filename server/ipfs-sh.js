@@ -90,6 +90,7 @@ function setFileName(hash, filename) {
 function getCSIfromCSV(path) {
   const csvfile = fs.readFileSync(path, 'utf8');
   const rows = csvfile.split('\n');
+  const length = 52; // the number of columns
   let data = [];
 
   rows.forEach(function (currentRow, index, rowsArray) {
@@ -109,17 +110,16 @@ function getCSIfromCSV(path) {
     );
 
     valuesOfRow.forEach(function (value, index, array) {
-      // if (index < 30) {
-      let rowData = {};
+      if (index < length - 1) {
+        let rowData = {};
 
-      rowData['subcarrier'] = index;
-      rowData['timestamp'] = Date.parse(timestamp);
-      rowData['value'] = Number(value);
+        rowData['subcarrier'] = index;
+        rowData['timestamp'] = Date.parse(timestamp);
+        rowData['value'] = Number(value);
 
-      data.push(rowData);
-      // }
+        data.push(rowData);
+      }
     });
-    data.pop(); // 맨뒤에 이상하게 붙더라 그거 빼
     data.sort(function (a, b) {
       return a.timestamp - b.timestamp;
     });
