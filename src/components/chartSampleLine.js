@@ -12,7 +12,7 @@ function ChartSampleLine({ data }) {
     data.sort((a, b) => a.timestamp - b.timestamp);
     let margin = { top: 10, right: 30, bottom: 30, left: 60 },
       width = 1500 - margin.left - margin.right,
-      height = 1000 - margin.top - margin.bottom;
+      height = 300 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
     let svg = d3
@@ -40,7 +40,7 @@ function ChartSampleLine({ data }) {
     let y = d3
       .scaleLinear()
       .domain([
-        -10,
+        0,
         d3.max(data, function (d) {
           return d.value;
         }),
@@ -85,7 +85,7 @@ function ChartSampleLine({ data }) {
             return x(d.timestamp);
           })
           .y(function (d) {
-            return y(+d.value);
+            return y(d.value);
           })(d[1]);
       });
   }, [data]);

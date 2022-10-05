@@ -7,6 +7,8 @@ export default function useIpfsFactory() {
   const [isIpfsReady, setIpfsReady] = useState(Boolean(ipfs));
   const [ipfsInitError, setIpfsInitError] = useState(null);
 
+  // const auth = 'Basic ' + Buffer.from('localhost:3000').toString('base64');
+
   useEffect(() => {
     connectIpfsDaemon();
     return function cleanup() {
