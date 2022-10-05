@@ -2,13 +2,17 @@ const fs = require('fs');
 const fp = require('filepath');
 const { exec, execSync, spawnSync, spawn } = require('child_process');
 const path = require('path');
-// const Chart = require('chart.js');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpeg = require('fluent-ffmpeg');
+const { KeyboardReturnOutlined } = require('@mui/icons-material');
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 exports.getCSIdatabyIPFS = function (hash, filename) {
   // 개짜증난다. 여기 일단 포기해
   // 그래프 부터 그려
+
   let CSI = {};
-  downloadFileByCID(hash);
+  downloadFileByHashes(hash);
   let waiting = 5000;
   setTimeout(() => {
     let newPath = setFileName(hash, filename);
@@ -27,12 +31,76 @@ exports.getCSI = function () {
 
   return dataCSI;
 };
-function downloadFileByCID(cid) {
+
+exports.getVideo = async function (hashes, conditions) {
+  const downloaded = await downloadFileByHashes(hashes);
+  const video = await concatVideos(hashes, conditions);
+  return video;
+  // return 'ㅁㄴㅇㄹ';
+};
+
+// https://sakeoflearning.com/run-multiple-shell-commands-using-node-js/
+function downloadFileByHashes(hashes) {
   // shell 명령어로 ipfs get 실행
-  const cmd = spawn('ipfs', ['get', `${cid}`]);
-  cmd.stdout.on('data', (output) => console.log(output.toString()));
+
+  let cmd = 'ipfs get ' + hashes.join(' && ipfs get ');
+
+  const shell = exec(cmd);
+  // 하나의 애기에서 계속 할 수 있도록
+
+  shell.stdout.on('data', (output) => {
+    console.log(output.toString());
+    if (output.toString().includes(hashes[hashes.length - 1])) {
+      console.log('finished file downloading');
+      concatVideos(hashes);
+
+      return true;
+    }
+  });
 }
 
+function concatVideos(hashes) {
+  const videoPath = 'videos/';
+  const videoTempPath = videoPath + 'tempDir';
+
+  let videoName = 'apple'; // 뭐 그때 조건검색했을때 있는 애로 해두면 나중에 볼때 편할듯
+
+  let merger = ffmpeg(videoPath + hashes[0]);
+
+  // 비디오의 개수를 알아야함
+  const numberOfVideos = hashes.length;
+
+  // 위에서 하나는 인풋 넣었으니까 0부터 말고 1부터.
+  for (let i = 1; i < numberOfVideos; i++) {
+    merger = merger.input(videoPath + hashes[i]);
+  }
+
+  merger
+    .on('error', function (err) {
+      console.log('An error occurred: ' + err.message);
+    })
+    .on('end', function () {
+      console.log('Merging finished !');
+      return true;
+    })
+    .mergeToFile(videoPath + videoName + '.mp4', videoTempPath);
+}
+
+function convertToMP4(inFilename) {
+  const inExtension = '.h264';
+  const outExtension = '.mp4';
+  // const outFilename = inFilename.split('.').pop() + outExtension;
+  // 파일명에 점이 여러개있을때 실패
+
+  const outFilename =
+    inFilename.substr(0, inFilename.lastIndexOf('.')) + outExtension;
+
+  // ffmpeg(inFilename).outputOptions('-c:v', 'copy').save(outFilename);
+
+  ffmpeg(inFilename).save(outFilename);
+
+  return outFilename;
+}
 // 다운로드가 완료되면 파일이름 변경하기
 // 다운이 다 되었는지 어떻게 알지?
 function setFileName(hash, filename) {
@@ -40,7 +108,7 @@ function setFileName(hash, filename) {
   const newName = filename;
 
   const fpOld = fp.newPath() + '/';
-  const fpNew = fp.newPath() + '/files/';
+  const fpNew = fp.newPath() + '/public/';
 
   let oldPath = fpOld + oldName;
   let newPath = fpNew + newName;
@@ -54,7 +122,7 @@ function setFileName(hash, filename) {
         console.log(err);
         return;
       }
-      console.log('file is downloaded');
+      console.log('file is moved in public directory');
     });
   } catch (err) {
     // console.log(err);
@@ -74,18 +142,6 @@ function setFileName(hash, filename) {
 
   return newPath;
 }
-
-// function streamVideo(cid) {
-//   const videoStream = fs.createReadStream(cid);
-// }
-
-// 원본 파일 삭제하기. - 왜자꾸 파일이없대? 폴더로 인식하는건가 확장자가 없어서 ?
-// fs.unlink(oldPath, function (err) {
-//   if (err) {
-//     console.log('Error : ', err);
-//   }
-//   console.log('deleted');
-// });
 
 function getCSIfromCSV(path) {
   const csvfile = fs.readFileSync(path, 'utf8');
