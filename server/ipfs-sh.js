@@ -33,10 +33,27 @@ exports.getCSI = function () {
 };
 
 exports.getVideo = async function (hashes, conditions) {
-  const downloaded = await downloadFileByHashes(hashes);
-  const video = await concatVideos(hashes, conditions);
-  return video;
-  // return 'ㅁㄴㅇㄹ';
+  const videoName = `${conditions.date} ${conditions.startTime}~${conditions.endTime}`;
+  const video = await downloadFileByHashes(hashes, videoName);
+  // const video = await concatVideos(hashes, conditions);
+
+  // [condition  구조]
+  // conditions = {
+  //   date: date.format('YYYY-MM-DD'),
+  //   startTime: startTime.format('HH:mm:ss'),
+  //   endTime: endTime.format('HH:mm:ss'),
+  // }
+
+  // Check if the file exists in the current directory.
+  fs.access(video, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.log('the video does not exist');
+      return false;
+    } else {
+      console.log('the video exists');
+      return video;
+    }
+  });
 };
 
 // https://sakeoflearning.com/run-multiple-shell-commands-using-node-js/
@@ -52,18 +69,17 @@ function downloadFileByHashes(hashes) {
     console.log(output.toString());
     if (output.toString().includes(hashes[hashes.length - 1])) {
       console.log('finished file downloading');
-      concatVideos(hashes);
+      const video = concatVideos(hashes);
+      console.log('어찌되나 보자 여기는 콘캣비디오 부른 다음줄');
 
-      return true;
+      return video;
     }
   });
 }
 
-function concatVideos(hashes) {
+function concatVideos(hashes, videoName) {
   const videoPath = 'videos/';
   const videoTempPath = videoPath + 'tempDir';
-
-  let videoName = 'apple'; // 뭐 그때 조건검색했을때 있는 애로 해두면 나중에 볼때 편할듯
 
   let merger = ffmpeg(videoPath + hashes[0]);
 
@@ -81,26 +97,12 @@ function concatVideos(hashes) {
     })
     .on('end', function () {
       console.log('Merging finished !');
-      return true;
+
+      return videoPath + videoName;
     })
     .mergeToFile(videoPath + videoName + '.mp4', videoTempPath);
 }
 
-function convertToMP4(inFilename) {
-  const inExtension = '.h264';
-  const outExtension = '.mp4';
-  // const outFilename = inFilename.split('.').pop() + outExtension;
-  // 파일명에 점이 여러개있을때 실패
-
-  const outFilename =
-    inFilename.substr(0, inFilename.lastIndexOf('.')) + outExtension;
-
-  // ffmpeg(inFilename).outputOptions('-c:v', 'copy').save(outFilename);
-
-  ffmpeg(inFilename).save(outFilename);
-
-  return outFilename;
-}
 // 다운로드가 완료되면 파일이름 변경하기
 // 다운이 다 되었는지 어떻게 알지?
 function setFileName(hash, filename) {
