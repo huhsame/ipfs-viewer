@@ -51,8 +51,6 @@ function App() {
     setConditions(testCondition);
     // setSeekAmount((timestamp - conditions.timestamp) / 1000);
     playerRef.current.seekTo(10, 'seconds');
-
-    // 이제 동영상 씩투 어떻게 하죠 ?
   }
 
   useEffect(() => {

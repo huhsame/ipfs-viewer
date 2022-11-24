@@ -23,6 +23,14 @@ function SearchView(onConditions) {
     // 그거 시작시간 끝시간 역행하지않게 체크해줘야함 끝시간이 스타트 시작보다 긴지. 확인하고 경고창 띄워주기
 
     setSubmitting(true);
+
+    // 엔드타임을 기본으로 3분뒤 시간으로 정해주자
+
+    const duration = 3;
+    let endTimeTemp = new Date(startTime);
+    endTimeTemp.setMinutes(startTime.getMinutes() + duration);
+
+    setEndTime(endTimeTemp);
     console.log(date, startTime, endTime);
     // https://devhints.io/moment
     // 포맷 바꿔서 서버에 전달
@@ -68,14 +76,14 @@ function SearchView(onConditions) {
               }}
               renderInput={(params) => <TextField {...params} />}
             />
-            <TimePicker
+            {/* <TimePicker
               label='end Time'
               value={endTime}
               onChange={(newValue) => {
                 setEndTime(newValue);
               }}
               renderInput={(params) => <TextField {...params} />}
-            />
+            /> */}
 
             <Button
               type='submit'
