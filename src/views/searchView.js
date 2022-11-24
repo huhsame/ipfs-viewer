@@ -13,7 +13,7 @@ import { TimePicker } from '@mui/x-date-pickers';
 import Grid from '@mui/material/Grid'; // Grid version 1
 import Grid2 from '@mui/material/Unstable_Grid2'; // Grid version 2
 
-function SearchView() {
+function SearchView(onConditions) {
   const [date, setDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
@@ -31,13 +31,9 @@ function SearchView() {
       startTime: startTime.format('HH:mm:ss'),
       endTime: endTime.format('HH:mm:ss'),
     };
-    const res = await axios.post('/metas', conditions); // 서버로 전달해야함.
-    // 서버에서 불러와야해
 
-    // 일단 하나씩 다운받아야하고..
-
-    // do something.. .검색 결과 띄ㅓ.
-    // 30초 단위로 비디오 했으면 2880 나오는거.. 어떻ㄱ ㅔ할까.
+    onConditions(conditions);
+    // const res = await axios.post('/metas', conditions); // 서버로
 
     event.preventDefault();
   };

@@ -148,7 +148,7 @@ function setFileName(hash, filename) {
 function getCSIfromCSV(path) {
   const csvfile = fs.readFileSync(path, 'utf8');
   const rows = csvfile.split('\n');
-  const length = 52; // the number of columns
+  const length = 2; // the number of columns
   let data = [];
 
   rows.forEach(function (currentRow, index, rowsArray) {

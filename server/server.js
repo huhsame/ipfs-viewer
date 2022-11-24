@@ -16,7 +16,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 // app.use(express.urlencoded({ extends: true }));
 
-const DB_MODE = 'l1'; // none, l1, l8, huh
+const DB_MODE = 'huh'; // none, l1, l8, huh
 let db;
 const huhDb = {
   host: process.env.LDB_HOST,
