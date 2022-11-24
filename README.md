@@ -5,11 +5,13 @@
 # Getting Started 
 
 node.js 서버와 리액트 클라이언트로 구성
+외부 디비와 ipfs와 연동
 
 ## 실행준비
 
 ### IPFS
 본 pc에 ipfs daemon이 실행 중이어야 함
+`App.js`에서 ipfs연결하는 부분 주석처리하고 Ipfs 부분 빼고 테스트실행 가능
 
 ### DB
 연결할 디비의 정보를 .env 파일에 설정
