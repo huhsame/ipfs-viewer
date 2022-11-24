@@ -44,6 +44,7 @@ useEffect()의 두번째 변수에 `[ipfs]`를 지정하여, ipfs 값이 변경�
 
 3파트로 구성
 - Search View: 검색 조건 입력. 시작시간이 입력되면 끝시간은 duration 만큼 증가한 시간으로 자동으로 설정됨
+  *처음에 뷰로 만드려고 했는데 어쩌다보니 컴포넌트가 됨*
 - Player: react-player 로 영상 플레이
 - Chart: d3.js로 CSI 데이터 시각화 (Line chart, tooltip)
 chart에서 원하는 지점 클릭 시 Player에서 해당 시간으로 이동
@@ -66,7 +67,7 @@ chart에서 원하는 지점 클릭 시 Player에서 해당 시간으로 이동
 과정이 모두 실행해야하지만 테스트를 위해 중간중간 과정생략한 코드들이 있으니 무시하되 지우지는 말것.
 
 
-# 
+
 
 
 
