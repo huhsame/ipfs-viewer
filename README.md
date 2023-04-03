@@ -49,6 +49,7 @@ useEffect()의 두번째 변수에 `[ipfs]`를 지정하여, ipfs 값이 변경�
 - Chart: d3.js로 CSI 데이터 시각화 (Line chart, tooltip)
 chart에서 원하는 지점 클릭 시 Player에서 해당 시간으로 이동
 *추후 sound파트 추가, labeling 파트 추가 될 수 있음*
+**영상이 지금 차트에서 어떤 시점인지 표시해주는 마크가 필요하다**
  
  현재 차트가 넓이가 고정이기 때문에 모바일에서 실행시 보기 불편할 수 있음
  
